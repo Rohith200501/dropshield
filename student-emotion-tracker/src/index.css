@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Glitter Effect */
+@layer utilities {
+  .glitter-bg {
+    background: linear-gradient(45deg, #ff6b9d, #c44569, #4b7bec, #45aaf2);
+    background-size: 400% 400%;
+    animation: glitter-bg 3s ease infinite;
+  }
+
+  .glitter-text {
+    background: linear-gradient(45deg, #ffd700, #ffa500, #ff6b9d, #4b7bec);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glitter-bg 2s ease infinite;
+  }
+
+  .glitter-dots::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.8) 2px, transparent 2px),
+      radial-gradient(circle at 80% 20%, rgba(255, 182, 193, 0.8) 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, rgba(135, 206, 235, 0.8) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 90% 90%, rgba(192, 192, 192, 0.8) 1px, transparent 1px);
+    background-size: 50px 50px, 80px 80px, 60px 60px, 40px 40px;
+    animation: glitter-float 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes glitter-bg {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glitter-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(180deg);
+  }
+}
