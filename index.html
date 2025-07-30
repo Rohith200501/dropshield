@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoTracker - Student Emotion Monitoring System</title>
+    <meta name="description" content="A comprehensive React + Tailwind application with Firebase Auth for monitoring student emotions using AI-powered face detection">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glitter-text {
+            background: linear-gradient(45deg, #ffd700, #ffa500, #ff6b9d, #4b7bec);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glitter 3s ease infinite;
+        }
+        
+        @keyframes glitter {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        
+        .tech-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-toggle {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-radius: 0 0 1rem 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #ff6b9d, #4b7bec);
+            transform-origin: left;
+            transform: scaleX(0);
+            z-index: 9999;
+            transition: transform 0.3s ease;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+    
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full z-50 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white font-bold text-2xl glitter-text">
+                ✨ EmoTracker
+            </div>
+            <div class="nav-menu hidden md:flex space-x-8">
+                <a href="#features" class="text-white hover:text-yellow-300 transition-colors">Features</a>
+                <a href="#tech-stack" class="text-white hover:text-yellow-300 transition-colors">Tech Stack</a>
+                <a href="#installation" class="text-white hover:text-yellow-300 transition-colors">Setup</a>
+                <a href="#usage" class="text-white hover:text-yellow-300 transition-colors">Usage</a>
+                <a href="#deployment" class="text-white hover:text-yellow-300 transition-colors">Deploy</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#demo" class="bg-gradient-to-r from-yellow-400 to-pink-500 text-white px-6 py-2 rounded-full hover:from-yellow-500 hover:to-pink-600 transition-all transform hover:scale-105 pulse">
+                    Try Demo
+                </a>
+                <button class="nav-toggle" onclick="toggleNav()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center px-6 pt-20">
+        <div class="container mx-auto text-center">
+            <div class="floating mb-8">
+                <h1 class="text-6xl md:text-8xl font-bold text-white mb-6" data-aos="fade-up">
+                    <span class="glitter-text">EmoTracker</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    A comprehensive React + Tailwind application with Firebase Auth for monitoring student emotions using AI-powered face detection, featuring role-based dashboards for Students, Faculty, and Administrators.
+                </p>
+            </div>
+            
+            <!-- Role Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" data-aos="fade-up" data-aos-delay="400">
+                <div class="glass-effect rounded-2xl p-6 hover-scale">
+                    <div class="text-4xl mb-4">👨‍🎓</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Students</h3>
+                    <p class="text-white/70">Track mood, mark attendance, view history</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 hover-scale">
+                    <div class="text-4xl mb-4">👨‍🏫</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Faculty</h3>
+                    <p class="text-white/70">Monitor students, add comments, send alerts</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 hover-scale">
+                    <div class="text-4xl mb-4">👨‍💼</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Admin</h3>
+                    <p class="text-white/70">Live emotion detection, analytics, management</p>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="space-x-4" data-aos="fade-up" data-aos-delay="600">
+                <a href="#demo" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-green-500 hover:to-blue-600 transition-all transform hover:scale-105 inline-block">
+                    🚀 Live Demo
+                </a>
+                <a href="#installation" class="glass-effect text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/20 transition-all transform hover:scale-105 inline-block">
+                    📖 Get Started
+                </a>
+                <a href="https://github.com/your-username/emotracker" class="bg-gradient-to-r from-gray-700 to-gray-900 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-gray-600 hover:to-gray-800 transition-all transform hover:scale-105 inline-flex items-center">
+                    <i class="fab fa-github mr-2"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                ✨ Features
+            </h2>
+
+            <!-- Authentication System -->
+            <div class="mb-16" data-aos="fade-up">
+                <div class="glass-effect rounded-3xl p-8 tech-card">
+                    <div class="flex items-center mb-6">
+                        <div class="feature-icon bg-gradient-to-r from-blue-500 to-purple-600">
+                            <i class="fas fa-shield-alt text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-white ml-4">🔐 Authentication System</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <ul class="text-white/80 space-y-3">
+                            <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Firebase Authentication with custom claims</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Multi-Role Support: Student, Faculty, Admin</li>
+                        </ul>
+                        <ul class="text-white/80 space-y-3">
+                            <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Glitter-Style Login Page with animations</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Role-based access control</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Features -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                <!-- Student Dashboard -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-right">
+                    <div class="feature-icon bg-gradient-to-r from-green-500 to-teal-600">
+                        <i class="fas fa-user-graduate text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">👨‍🎓 Student Dashboard</h3>
+                    <ul class="text-white/80 space-y-2">
+                        <li>✅ Mood Emoji Tracker with 8 emotions</li>
+                        <li>✅ Attendance Button with late detection</li>
+                        <li>✅ Mood History Log with timestamps</li>
+                        <li>✅ Beautiful Framer Motion animations</li>
+                    </ul>
+                </div>
+
+                <!-- Faculty Dashboard -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-up">
+                    <div class="feature-icon bg-gradient-to-r from-orange-500 to-red-600">
+                        <i class="fas fa-chalkboard-teacher text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">👨‍🏫 Faculty Dashboard</h3>
+                    <ul class="text-white/80 space-y-2">
+                        <li>✅ Student Overview with real-time data</li>
+                        <li>✅ Comment System for observations</li>
+                        <li>✅ Alert System to notify admin</li>
+                        <li>✅ Search and Filter functionality</li>
+                    </ul>
+                </div>
+
+                <!-- Admin Panel -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-left">
+                    <div class="feature-icon bg-gradient-to-r from-purple-500 to-pink-600">
+                        <i class="fas fa-user-cog text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">👨‍💼 Admin Panel</h3>
+                    <ul class="text-white/80 space-y-2">
+                        <li>✅ Live Face Emotion Detection</li>
+                        <li>✅ Real-time Camera Feed</li>
+                        <li>✅ Faculty Alert Management</li>
+                        <li>✅ MongoDB Integration & Analytics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- UI/UX Features -->
+            <div class="glass-effect rounded-3xl p-8 tech-card" data-aos="fade-up">
+                <div class="flex items-center mb-6">
+                    <div class="feature-icon bg-gradient-to-r from-pink-500 to-purple-600">
+                        <i class="fas fa-palette text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white ml-4">🎨 UI/UX Features</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <i class="fas fa-sparkles text-3xl text-yellow-400 mb-3"></i>
+                        <p class="text-white/80">Particles.js animated backgrounds</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-magic text-3xl text-purple-400 mb-3"></i>
+                        <p class="text-white/80">Framer Motion transitions</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-mobile-alt text-3xl text-blue-400 mb-3"></i>
+                        <p class="text-white/80">Tailwind CSS responsive design</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech-stack" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🚀 Tech Stack
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Frontend -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-6xl mb-6">⚛️</div>
+                    <h3 class="text-2xl font-bold text-white mb-6">Frontend</h3>
+                    <div class="grid grid-cols-2 gap-4 text-white/80">
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">React 18</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">TypeScript</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Tailwind CSS</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Framer Motion</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Firebase</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">face-api.js</div>
+                    </div>
+                </div>
+
+                <!-- Backend -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-6xl mb-6">🟢</div>
+                    <h3 class="text-2xl font-bold text-white mb-6">Backend</h3>
+                    <div class="grid grid-cols-2 gap-4 text-white/80">
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Node.js</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Express</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">MongoDB</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Mongoose</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">JWT</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">CORS</div>
+                    </div>
+                </div>
+
+                <!-- Deployment -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-6xl mb-6">🚀</div>
+                    <h3 class="text-2xl font-bold text-white mb-6">Deployment</h3>
+                    <div class="grid grid-cols-1 gap-4 text-white/80">
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Vercel (Frontend)</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Render (Backend)</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">MongoDB Atlas</div>
+                        <div class="bg-white/10 rounded-lg p-3 hover:bg-white/20 transition-colors">Firebase Auth</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Structure Section -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                📁 Project Structure
+            </h2>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-up">
+                    <div class="code-block text-green-400 text-sm">
+<pre>/
+├── student-emotion-tracker/     # React Frontend
+│   ├── src/
+│   │   ├── components/         # React Components
+│   │   │   ├── GlitterLogin.tsx
+│   │   │   ├── StudentDashboard.tsx
+│   │   │   ├── FacultyDashboard.tsx
+│   │   │   └── AdminPanel.tsx
+│   │   ├── contexts/          # React Contexts
+│   │   │   └── AuthContext.tsx
+│   │   ├── firebase/          # Firebase Config
+│   │   │   └── config.ts
+│   │   └── ...
+│   ├── public/
+│   ├── tailwind.config.js
+│   ├── vercel.json           # Vercel deployment config
+│   └── ...
+├── backend/                   # Express Backend
+│   ├── server.js             # Main server file
+│   ├── package.json
+│   ├── render.yaml          # Render deployment config
+│   └── .env.example
+└── README.md</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🛠️ Installation & Setup
+            </h2>
+
+            <div class="max-w-6xl mx-auto">
+                <!-- Prerequisites -->
+                <div class="glass-effect rounded-2xl p-8 mb-8" data-aos="fade-up">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-clipboard-list mr-3 text-yellow-400"></i>
+                        Prerequisites
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <i class="fab fa-node-js text-3xl text-green-400 mb-2"></i>
+                            <p class="text-white/80">Node.js (v16+)</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <i class="fas fa-database text-3xl text-blue-400 mb-2"></i>
+                            <p class="text-white/80">MongoDB</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <i class="fas fa-fire text-3xl text-orange-400 mb-2"></i>
+                            <p class="text-white/80">Firebase</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <i class="fab fa-git-alt text-3xl text-red-400 mb-2"></i>
+                            <p class="text-white/80">Git</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Installation Steps -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Clone Repository -->
+                    <div class="glass-effect rounded-2xl p-8" data-aos="fade-right">
+                        <h3 class="text-xl font-bold text-white mb-4">1. Clone Repository</h3>
+                        <div class="code-block text-green-400 text-sm">
+git clone &lt;repository-url&gt;
+cd student-emotion-tracker
+                        </div>
+                    </div>
+
+                    <!-- Frontend Setup -->
+                    <div class="glass-effect rounded-2xl p-8" data-aos="fade-left">
+                        <h3 class="text-xl font-bold text-white mb-4">2. Frontend Setup</h3>
+                        <div class="code-block text-green-400 text-sm">
+cd student-emotion-tracker
+npm install
+cp .env.example .env
+npm start
+                        </div>
+                    </div>
+
+                    <!-- Backend Setup -->
+                    <div class="glass-effect rounded-2xl p-8" data-aos="fade-right">
+                        <h3 class="text-xl font-bold text-white mb-4">3. Backend Setup</h3>
+                        <div class="code-block text-green-400 text-sm">
+cd ../backend
+npm install
+cp .env.example .env
+npm run dev
+                        </div>
+                    </div>
+
+                    <!-- Firebase Config -->
+                    <div class="glass-effect rounded-2xl p-8" data-aos="fade-left">
+                        <h3 class="text-xl font-bold text-white mb-4">4. Firebase Configuration</h3>
+                        <ul class="text-white/80 space-y-2 text-sm">
+                            <li>• Create Firebase project</li>
+                            <li>• Enable Email/Password Auth</li>
+                            <li>• Add config to .env file</li>
+                            <li>• Setup MongoDB URI</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section id="usage" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                📱 Usage Guide
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Students -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">👨‍🎓</div>
+                        <h3 class="text-2xl font-bold text-white">For Students</h3>
+                    </div>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">1.</span>
+                            Register/Login with student role
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">2.</span>
+                            Track daily mood with emoji selection
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">3.</span>
+                            Mark attendance
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">4.</span>
+                            View mood history and trends
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Faculty -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">👨‍🏫</div>
+                        <h3 class="text-2xl font-bold text-white">For Faculty</h3>
+                    </div>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-blue-400 mr-3 mt-1">1.</span>
+                            Register/Login with faculty role
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-400 mr-3 mt-1">2.</span>
+                            Monitor student moods and attendance
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-400 mr-3 mt-1">3.</span>
+                            Add comments about students
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-400 mr-3 mt-1">4.</span>
+                            Send alerts to admin for concerns
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Administrators -->
+                <div class="glass-effect rounded-2xl p-8 tech-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">👨‍💼</div>
+                        <h3 class="text-2xl font-bold text-white">For Administrators</h3>
+                    </div>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-purple-400 mr-3 mt-1">1.</span>
+                            Register/Login with admin role
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-purple-400 mr-3 mt-1">2.</span>
+                            Monitor live emotion detection
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-purple-400 mr-3 mt-1">3.</span>
+                            Review faculty alerts
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-purple-400 mr-3 mt-1">4.</span>
+                            Analyze emotion data and trends
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deployment Section -->
+    <section id="deployment" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🚀 Deployment
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Frontend Deployment -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-right">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-laptop-code mr-3 text-blue-400"></i>
+                        Frontend (Vercel)
+                    </h3>
+                    <ol class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">1</span>
+                            Push code to GitHub
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">2</span>
+                            Connect GitHub repo to Vercel
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">3</span>
+                            Set environment variables
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">4</span>
+                            Deploy automatically on push
+                        </li>
+                    </ol>
+                    
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold text-white mb-3">Environment Variables:</h4>
+                        <div class="code-block text-green-400 text-xs">
+REACT_APP_FIREBASE_API_KEY=your-api-key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-domain
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_API_URL=https://your-backend.onrender.com/api
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Deployment -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-left">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-server mr-3 text-green-400"></i>
+                        Backend (Render)
+                    </h3>
+                    <ol class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">1</span>
+                            Push code to GitHub
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">2</span>
+                            Create new Web Service on Render
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">3</span>
+                            Connect GitHub repo
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">4</span>
+                            Set environment variables & deploy
+                        </li>
+                    </ol>
+                    
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold text-white mb-3">Environment Variables:</h4>
+                        <div class="code-block text-green-400 text-xs">
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/emotracker
+PORT=5000
+NODE_ENV=production
+JWT_SECRET=your-secret-key
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🎯 Live Demo
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Student Demo -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-6xl mb-6">👨‍🎓</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Student Portal</h3>
+                    <p class="text-white/80 mb-6">Experience mood tracking, attendance marking, and history viewing</p>
+                    <a href="student-emotion-tracker/index.html?role=student" class="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-full hover:from-blue-500 hover:to-purple-600 transition-all transform hover:scale-105 inline-block pulse">
+                        Try Student Dashboard
+                    </a>
+                </div>
+
+                <!-- Faculty Demo -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-6xl mb-6">👨‍🏫</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Faculty Portal</h3>
+                    <p class="text-white/80 mb-6">Monitor students, add comments, and send alerts to administration</p>
+                    <a href="student-emotion-tracker/index.html?role=faculty" class="bg-gradient-to-r from-green-400 to-teal-500 text-white px-6 py-3 rounded-full hover:from-green-500 hover:to-teal-600 transition-all transform hover:scale-105 inline-block pulse">
+                        Try Faculty Dashboard
+                    </a>
+                </div>
+
+                <!-- Admin Demo -->
+                <div class="glass-effect rounded-2xl p-8 text-center tech-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-6xl mb-6">👨‍💼</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Admin Panel</h3>
+                    <p class="text-white/80 mb-6">Live emotion detection, analytics, and system management</p>
+                    <a href="student-emotion-tracker/index.html?role=admin" class="bg-gradient-to-r from-red-400 to-pink-500 text-white px-6 py-3 rounded-full hover:from-red-500 hover:to-pink-600 transition-all transform hover:scale-105 inline-block pulse">
+                        Try Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Detail Section -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🎯 Features in Detail
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Face Emotion Detection -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-right">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-camera mr-3 text-purple-400"></i>
+                        Face Emotion Detection
+                    </h3>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-brain text-blue-400 mr-3"></i>
+                            Uses face-api.js for real-time detection
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-smile text-yellow-400 mr-3"></i>
+                            7 emotions: happy, sad, angry, fearful, disgusted, surprised, neutral
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-chart-line text-green-400 mr-3"></i>
+                            Confidence scoring for accuracy
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-video text-red-400 mr-3"></i>
+                            Real-time camera feed with overlay
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Data Persistence -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-left">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-database mr-3 text-green-400"></i>
+                        Data Persistence
+                    </h3>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-save text-blue-400 mr-3"></i>
+                            MongoDB stores all emotion detections
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-user text-yellow-400 mr-3"></i>
+                            Student profiles and history
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-comments text-purple-400 mr-3"></i>
+                            Faculty comments and alerts
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-chart-bar text-orange-400 mr-3"></i>
+                            Analytics and reporting data
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Security -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-right">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-shield-alt mr-3 text-red-400"></i>
+                        Security
+                    </h3>
+                    <ul class="text-white/80 space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-fire text-orange-400 mr-3"></i>
+                            Firebase Authentication
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-users-cog text-blue-400 mr-3"></i>
+                            Role-based access control
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-key text-yellow-400 mr-3"></i>
+                            JWT tokens for API authentication
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-double text-green-400 mr-3"></i>
+                            Input validation and sanitization
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contributing -->
+                <div class="glass-effect rounded-2xl p-8" data-aos="fade-left">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-hands-helping mr-3 text-pink-400"></i>
+                        Contributing
+                    </h3>
+                    <ol class="text-white/80 space-y-3">
+                        <li class="flex items-start">
+                            <span class="bg-pink-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">1</span>
+                            Fork the repository
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-pink-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">2</span>
+                            Create a feature branch
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-pink-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">3</span>
+                            Commit your changes
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-pink-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">4</span>
+                            Open a Pull Request
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Acknowledgments Section -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-5xl font-bold text-white text-center mb-16 glitter-text" data-aos="fade-up">
+                🙏 Acknowledgments
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <div class="glass-effect rounded-xl p-6 text-center hover-scale" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-brain text-3xl text-purple-400 mb-3"></i>
+                    <h4 class="text-white font-semibold mb-2">face-api.js</h4>
+                    <p class="text-white/60 text-sm">Emotion detection</p>
+                </div>
+                <div class="glass-effect rounded-xl p-6 text-center hover-scale" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-fire text-3xl text-orange-400 mb-3"></i>
+                    <h4 class="text-white font-semibold mb-2">Firebase</h4>
+                    <p class="text-white/60 text-sm">Authentication</p>
+                </div>
+                <div class="glass-effect rounded-xl p-6 text-center hover-scale" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-wind text-3xl text-blue-400 mb-3"></i>
+                    <h4 class="text-white font-semibold mb-2">Tailwind CSS</h4>
+                    <p class="text-white/60 text-sm">Beautiful styling</p>
+                </div>
+                <div class="glass-effect rounded-xl p-6 text-center hover-scale" data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-magic text-3xl text-pink-400 mb-3"></i>
+                    <h4 class="text-white font-semibold mb-2">Framer Motion</h4>
+                    <p class="text-white/60 text-sm">Smooth animations</p>
+                </div>
+                <div class="glass-effect rounded-xl p-6 text-center hover-scale" data-aos="fade-up" data-aos-delay="500">
+                    <i class="fas fa-sparkles text-3xl text-yellow-400 mb-3"></i>
+                    <h4 class="text-white font-semibold mb-2">particles.js</h4>
+                    <p class="text-white/60 text-sm">Background effects</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-6 border-t border-white/20">
+        <div class="container mx-auto">
+            <div class="text-center mb-12">
+                <div class="text-5xl font-bold glitter-text mb-4">✨ EmoTracker</div>
+                <p class="text-white/70 mb-8 max-w-2xl mx-auto">
+                    Built with ❤️ by the EmoTracker Team. A comprehensive student emotion monitoring system using cutting-edge AI technology.
+                </p>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center space-x-6 mb-8">
+                    <a href="https://github.com/your-username/emotracker" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="mailto:support@emotracker.com" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Footer Links -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-white/70">
+                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#tech-stack" class="hover:text-white transition-colors">Tech Stack</a></li>
+                        <li><a href="#installation" class="hover:text-white transition-colors">Installation</a></li>
+                        <li><a href="#demo" class="hover:text-white transition-colors">Demo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Documentation</h4>
+                    <ul class="space-y-2 text-white/70">
+                        <li><a href="#usage" class="hover:text-white transition-colors">Usage Guide</a></li>
+                        <li><a href="#deployment" class="hover:text-white transition-colors">Deployment</a></li>
+                        <li><a href="https://github.com/your-username/emotracker" class="hover:text-white transition-colors">API Docs</a></li>
+                        <li><a href="https://github.com/your-username/emotracker/wiki" class="hover:text-white transition-colors">Wiki</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-white/70">
+                        <li><a href="mailto:support@emotracker.com" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="https://github.com/your-username/emotracker/issues" class="hover:text-white transition-colors">Issues</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">License</h4>
+                    <ul class="space-y-2 text-white/70">
+                        <li><a href="https://github.com/your-username/emotracker/blob/main/LICENSE" class="hover:text-white transition-colors">MIT License</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Code of Conduct</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center text-white/50 text-sm border-t border-white/10 pt-8">
+                <p>© 2024 EmoTracker. All rights reserved. | Built with React, Firebase, and ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-gradient-to-r from-yellow-400 to-pink-500 text-white p-3 rounded-full shadow-lg hover:from-yellow-500 hover:to-pink-600 transition-all transform hover:scale-110 z-50 opacity-0 pointer-events-none">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 60, density: { enable: true, value_area: 800 } },
+                color: { value: '#ffffff' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: false },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#ffffff',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 100, duration: 0.4 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Navigation toggle for mobile
+        function toggleNav() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll indicator
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight - window.innerHeight;
+            const scrollPercent = scrollTop / docHeight;
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            scrollIndicator.style.transform = `scaleX(${scrollPercent})`;
+        });
+
+        // Back to top button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.style.opacity = '1';
+                backToTopButton.style.pointerEvents = 'auto';
+            } else {
+                backToTopButton.style.opacity = '0';
+                backToTopButton.style.pointerEvents = 'none';
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelector('.nav-menu').classList.remove('active');
+            });
+        });
+
+        // Add loading animation to demo buttons
+        document.querySelectorAll('a[href*="student-emotion-tracker"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!this.href.includes('#')) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
